@@ -7,9 +7,9 @@
     class Database {
 
         private $servername = "localhost";
-        private $username = "user";
-        // private $password_db = "memorophiliaForFallenPineCones";
-        // private $dbname = "grind_tutor_service";
+        private $username = "root";
+        private $password_db = "";
+        private $dbname = "mydb";
         public $conn;
      
         // Get the database connection
