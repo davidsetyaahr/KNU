@@ -11,18 +11,16 @@
     
         // Database connection and table name
         private $conn;
-        private $tableName = "User_table";
+        private $tableName = "User";
         // Tutor properties
-        public $u_num;
-        public $u_fname;
-        public $u_lname;
-        public $u_bdate;
-        public $u_sex;
+        public $u_id;
         public $u_email;
-        public $u_password;     // TODO: Remove. Only for developing purposes
+        public $u_name;      
+        public $u_phonenumber;
         public $u_address;
+        public $u_password;
        
-        //Subject_table items
+
     
         // Constructor with $db as database connection
         public function __construct($db) {
@@ -48,36 +46,32 @@
         function register() {
 
             // Validate user input
-            $this->u_fname       = testInput($this->u_fname);
-            $this->u_lname       = testInput($this->u_lname);
-            $this->u_bdate       = testInput($this->u_bdate);
-            $this->u_sex         = testInput($this->u_sex);
             $this->u_email       = testInput($this->u_email);
-            $this->u_password    = testInput($this->u_password);
+            $this->u_name        = testInput($this->u_name);
+            $this->u_phonenumber = testInput($this->u_phonenumber);
             $this->u_address     = testInput($this->u_address);
+            $this->u_password    = testInput($this->u_password);
 
             // Check that tutor is not registered already
-            $result = $this->conn->query("SELECT * FROM $this->tableName WHERE t_email LIKE '$this->t_email'");
+            $result = $this->conn->query("SELECT * FROM $this->tableName WHERE Email LIKE '$this->u_email'");
 
             if ($result->rowCount() === 0) {
 
                 // Insert query
                 $query = "INSERT INTO $this->tableName 
-                          (t_fname, t_lname, t_bdate, t_sex, t_email, t_password, t_address)
+                          (Email, Name, Phone_number, address, Password)
                           VALUES
-                          (:firstName, :lastName, :birthday, :sex, :email, :hashedPassword, :street)";
+                          (:email, :username, :phonenumber, :address, :hashedPassword)";
 
                 // Prepare insert statement
                 $insert = $this->conn->prepare($query);
 
-                $insert->bindParam(":firstName", $this->u_fname);
-                $insert->bindParam(":lastName", $this->u_lname);
-                $insert->bindParam(":birthday", $this->u_bdate);
-                $insert->bindParam(":sex", $this->u_sex);
                 $insert->bindParam(":email", $this->u_email);
-                $insert->bindParam(":street", $this->u_address);
+                $insert->bindParam(":username", $this->u_name);
+                $insert->bindParam(":phonenumber", $this->u_phonenumber);
+                $insert->bindParam(":address", $this->u_address);
                 // Hash password before storing it
-                $this->t_password = password_hash($this->u_password, PASSWORD_DEFAULT);
+                $this->u_password = password_hash($this->u_password, PASSWORD_DEFAULT);
                 $insert->bindParam(":hashedPassword", $this->u_password);
 
                 // Send new user to DB
@@ -96,23 +90,21 @@
         }
 
         // Same like in registration, expect data in body
-        function login() {
-
+        function login($email, $password) {
             // Validate user input
-            $this->u_email      = testInput($this->u_email);
-            $this->u_password   = testInput($this->u_password);
+            $this->u_email      = testInput($email);
+            $this->u_password   = testInput($password);
 
             // Fetch data from db with given email
-            $result = $this->conn->query("SELECT * FROM $this->tableName WHERE t_email LIKE '$this->t_email'");
+            $result = $this->conn->query("SELECT * FROM $this->tableName WHERE Email LIKE '$this->u_email'");
 
             // Check that tutor exists in database
             if ($result->rowCount() === 1) {
 
                 // Fetch user record from result
                 $user = $result->fetch();
-
                 // Check password match
-                if (password_verify($this->t_password, $user["t_password"])) {
+                if (password_verify($this->u_password, $user["Password"])) {
                     return true;
                 }
                 // Passwords do not match
@@ -122,17 +114,18 @@
             }
             // User with given email not in database
             else {
+                echo "false 2";
                 return false;
             }
         }
 
         // Fetch user ID
         function fetchID() {
-
-            // FIXME For some reason t_email = $this->t_email results in SQL error
+            echo ($this->u_id);
+            // FIXME For some reason u_email = $this->u_email results in SQL error
             // Using conn->query also makes this vulnerable to SQL injection
             // But prepare and execute refused to work for me
-            $query = "SELECT t_num FROM $this->tableName WHERE t_email LIKE '$this->t_email'";
+            $query = "SELECT idUser FROM $this->tableName WHERE idUser LIKE '$this->u_id'";
 
             try {
                 $result = $this->conn->query($query);
@@ -142,9 +135,9 @@
             }
 
             // Fetch tutor ID as integer
-            $tutorID = (int)$result->fetchColumn();
+            $userID = (int)$result->fetchColumn();
 
-            return $tutorID;
+            return $userID;
         }
 
          
