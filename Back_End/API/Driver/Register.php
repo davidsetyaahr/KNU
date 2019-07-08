@@ -34,7 +34,8 @@
         !empty($data->name) &&
         !empty($data->phonenumber) &&
         !empty($data->status) &&
-        !empty($data->password)) {
+        !empty($data->password) &&
+        !empty($data->fbtoken)) {
         
         // Set values in driver.php
         $driver->d_email       = $data->email;
@@ -42,6 +43,7 @@
         $driver->d_phonenumber = $data->phonenumber;
         $driver->d_status      = $data->status;
         $driver->d_password    = $data->password;
+        $driver->d_fb_token    = $data->fbtoken;
        
         // Successful registration returns true
         if ($driver->register()) {

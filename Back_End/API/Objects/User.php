@@ -19,7 +19,7 @@
         public $u_phonenumber;
         public $u_address;
         public $u_password;
-       
+        public $u_fb_token;
 
     
         // Constructor with $db as database connection
@@ -51,6 +51,7 @@
             $this->u_phonenumber = testInput($this->u_phonenumber);
             $this->u_address     = testInput($this->u_address);
             $this->u_password    = testInput($this->u_password);
+            $this->u_fb_token    = testInput($this->u_fb_token);
 
             // Check that tutor is not registered already
             $result = $this->conn->query("SELECT * FROM $this->tableName WHERE Email LIKE '$this->u_email'");
@@ -59,9 +60,9 @@
 
                 // Insert query
                 $query = "INSERT INTO $this->tableName 
-                          (Email, Name, Phone_number, address, Password)
+                          (Email, Name, Phone_number, address, Password, Fb_Token)
                           VALUES
-                          (:email, :username, :phonenumber, :address, :hashedPassword)";
+                          (:email, :username, :phonenumber, :address, :hashedPassword, :firebaseToken)";
 
                 // Prepare insert statement
                 $insert = $this->conn->prepare($query);
@@ -73,6 +74,7 @@
                 // Hash password before storing it
                 $this->u_password = password_hash($this->u_password, PASSWORD_DEFAULT);
                 $insert->bindParam(":hashedPassword", $this->u_password);
+                $insert->bindParam(":firebaseToken", $this->u_fb_token);
 
                 // Send new user to DB
                 try {

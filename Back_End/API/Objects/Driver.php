@@ -19,6 +19,7 @@
         public $d_phonenumber;
         public $d_status;
         public $d_password;
+        public $d_fb_token;
        
 
     
@@ -54,6 +55,7 @@
             $this->d_phonenumber = testInput($this->d_phonenumber);
             $this->d_status      = testInput($this->d_status);
             $this->d_password    = testInput($this->d_password);
+            $this->d_fb_token    = testInput($this->d_fb_token);
 
             // Check that tutor is not registered already
             $result = $this->conn->query("SELECT * FROM $this->tableName WHERE Email LIKE '$this->d_email'");
@@ -62,9 +64,9 @@
 
                 // Insert query
                 $query = "INSERT INTO $this->tableName 
-                          (Email, Driver_name, driver_cell_phone, status, Password)
+                          (Email, Driver_name, driver_cell_phone, status, Password, Fb_Token)
                           VALUES
-                          (:email, :drivername, :phonenumber, :status, :hashedPassword)";
+                          (:email, :drivername, :phonenumber, :status, :hashedPassword, :firebaseToken)";
 
                 // Prepare insert statement
                 $insert = $this->conn->prepare($query);
@@ -76,6 +78,7 @@
                 // Hash password before storing it
                 $this->d_password = password_hash($this->d_password, PASSWORD_DEFAULT);
                 $insert->bindParam(":hashedPassword", $this->d_password);
+                $insert->bindParam(":firebaseToken", $this->d_fb_token);
 
                 // Send new driver to DB
                 try {

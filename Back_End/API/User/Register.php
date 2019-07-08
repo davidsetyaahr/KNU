@@ -35,7 +35,8 @@
         !empty($data->name) &&
         !empty($data->phonenumber) &&
         !empty($data->address) &&
-        !empty($data->password)) {
+        !empty($data->password) &&
+        !empty($data->fbtoken)) {
         
         // Set values in user.php
         $user->u_email       = $data->email;
@@ -43,7 +44,7 @@
         $user->u_phonenumber = $data->phonenumber;
         $user->u_address     = $data->address;
         $user->u_password    = $data->password;
-       
+        $user->u_fb_token    = $data->fbtoken;
         // Successful registration returns true
         if ($user->register()) {
 
