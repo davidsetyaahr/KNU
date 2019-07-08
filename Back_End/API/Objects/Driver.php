@@ -1,24 +1,24 @@
 <?php
 /*
-    User class. Includes properties and CRUD methods.
+    Driver class. Includes properties and CRUD methods.
     Actual CRUD operations are made in separate scripts
     which initialize an object from this class.
 */
-    // Script for validating any user input
+    // Script for validating any Driver input
     include_once "../Shared/testInput.php";
     
-    class User {
+    class Driver {
     
         // Database connection and table name
         private $conn;
-        private $tableName = "User";
+        private $tableName = "ambulance";
         // Tutor properties
-        public $u_id;
-        public $u_email;
-        public $u_name;      
-        public $u_phonenumber;
-        public $u_address;
-        public $u_password;
+        public $d_id;
+        public $d_email;
+        public $d_name;      
+        public $d_phonenumber;
+        public $d_status;
+        public $d_password;
        
 
     
@@ -34,47 +34,50 @@
             $query = "SELECT * FROM ".$this->tableName;
         
             // Prepare query statement
-            $users = $this->conn->prepare($query);
+            $drivers = $this->conn->prepare($query);
         
             // Execute query
-            $users->execute();
+            $drivers->execute();
         
-            return $users;
+            return $drivers;
         }
         
         // Register
+
+    
+       
         function register() {
 
-            // Validate user input
-            $this->u_email       = testInput($this->u_email);
-            $this->u_name        = testInput($this->u_name);
-            $this->u_phonenumber = testInput($this->u_phonenumber);
-            $this->u_address     = testInput($this->u_address);
-            $this->u_password    = testInput($this->u_password);
+            // Validate driver input
+            $this->d_email       = testInput($this->d_email);
+            $this->d_name        = testInput($this->d_name);
+            $this->d_phonenumber = testInput($this->d_phonenumber);
+            $this->d_status      = testInput($this->d_status);
+            $this->d_password    = testInput($this->d_password);
 
             // Check that tutor is not registered already
-            $result = $this->conn->query("SELECT * FROM $this->tableName WHERE Email LIKE '$this->u_email'");
+            $result = $this->conn->query("SELECT * FROM $this->tableName WHERE Email LIKE '$this->d_email'");
 
             if ($result->rowCount() === 0) {
 
                 // Insert query
                 $query = "INSERT INTO $this->tableName 
-                          (Email, Name, Phone_number, address, Password)
+                          (Email, Driver_name, driver_cell_phone, status, Password)
                           VALUES
-                          (:email, :username, :phonenumber, :address, :hashedPassword)";
+                          (:email, :drivername, :phonenumber, :status, :hashedPassword)";
 
                 // Prepare insert statement
                 $insert = $this->conn->prepare($query);
 
-                $insert->bindParam(":email", $this->u_email);
-                $insert->bindParam(":username", $this->u_name);
-                $insert->bindParam(":phonenumber", $this->u_phonenumber);
-                $insert->bindParam(":address", $this->u_address);
+                $insert->bindParam(":email", $this->d_email);
+                $insert->bindParam(":drivername", $this->d_name);
+                $insert->bindParam(":phonenumber", $this->d_phonenumber);
+                $insert->bindParam(":status", $this->d_status);
                 // Hash password before storing it
-                $this->u_password = password_hash($this->u_password, PASSWORD_DEFAULT);
-                $insert->bindParam(":hashedPassword", $this->u_password);
+                $this->d_password = password_hash($this->d_password, PASSWORD_DEFAULT);
+                $insert->bindParam(":hashedPassword", $this->d_password);
 
-                // Send new user to DB
+                // Send new driver to DB
                 try {
                     $insert->execute();
                     return true;
@@ -91,20 +94,20 @@
 
         // Same like in registration, expect data in body
         function login($email, $password) {
-            // Validate user input
-            $this->u_email      = testInput($email);
-            $this->u_password   = testInput($password);
+            // Validate driver input
+            $this->d_email      = testInput($email);
+            $this->d_password   = testInput($password);
 
             // Fetch data from db with given email
-            $result = $this->conn->query("SELECT * FROM $this->tableName WHERE Email LIKE '$this->u_email'");
+            $result = $this->conn->query("SELECT * FROM $this->tableName WHERE Email LIKE '$this->d_email'");
 
             // Check that tutor exists in database
             if ($result->rowCount() === 1) {
 
-                // Fetch user record from result
+                // Fetch driver record from result
                 $user = $result->fetch();
                 // Check password match
-                if (password_verify($this->u_password, $user["Password"])) {
+                if (password_verify($this->d_password, $user["Password"])) {
                     return true;
                 }
                 // Passwords do not match
@@ -120,11 +123,11 @@
 
         // Fetch user ID
         function fetchID() {
-            echo ($this->u_id);
-            // FIXME For some reason u_email = $this->u_email results in SQL error
+            echo ($this->d_id);
+            // FIXME For some reason d_email = $this->d_email results in SQL error
             // Using conn->query also makes this vulnerable to SQL injection
             // But prepare and execute refused to work for me
-            $query = "SELECT idambulance FROM $this->tableName WHERE Email LIKE '$this->u_email'";
+            $query = "SELECT idambulance FROM $this->tableName WHERE Email LIKE '$this->d_email'";
 
             try {
                 $result = $this->conn->query($query);

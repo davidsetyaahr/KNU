@@ -1,7 +1,7 @@
 <?php
 
 /*
-   User log in. Send token with success message.
+   driver log in. Send token with success message.
 
     API call is made using POST to this script.
 */
@@ -11,17 +11,17 @@
     header("Access-Control-Allow-Origin: *");
     header("Content-Type: application/json; charset=UTF-8");
     header("Access-Control-Allow-Methods: POST");
-
+    
     // Include database and object files
     include_once "../Config/database.php";
-    include_once "../Objects/User.php";
+    include_once "../Objects/Driver.php";
     
     // Instantiate database
     $database = new Database();
     $db = $database->getConnection();
     
-    // Initialize user object
-    $user = new user($db);
+    // Initialize driver object
+    $driver = new driver($db);
     
 
     // Get data sent from front-end
@@ -29,23 +29,22 @@
     // file_get_contents reads parameter into one string
     // json_decode converts json string to php variable
     $data = json_decode(file_get_contents('php://input'));
-
     // Check that data is not missing any info
     if (!empty($data->email) &&
         !empty($data->name) &&
         !empty($data->phonenumber) &&
-        !empty($data->address) &&
+        !empty($data->status) &&
         !empty($data->password)) {
         
-        // Set values in user.php
-        $user->u_email       = $data->email;
-        $user->u_name        = $data->name;
-        $user->u_phonenumber = $data->phonenumber;
-        $user->u_address     = $data->address;
-        $user->u_password    = $data->password;
+        // Set values in driver.php
+        $driver->d_email       = $data->email;
+        $driver->d_name        = $data->name;
+        $driver->d_phonenumber = $data->phonenumber;
+        $driver->d_status      = $data->status;
+        $driver->d_password    = $data->password;
        
         // Successful registration returns true
-        if ($user->register()) {
+        if ($driver->register()) {
 
             // HTTP status code - 200 OK
             http_response_code(200);
