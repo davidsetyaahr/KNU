@@ -126,7 +126,7 @@
             // FIXME For some reason u_email = $this->u_email results in SQL error
             // Using conn->query also makes this vulnerable to SQL injection
             // But prepare and execute refused to work for me
-            $query = "SELECT idambulance FROM $this->tableName WHERE Email LIKE '$this->u_email'";
+            $query = "SELECT idUser FROM $this->tableName WHERE Email LIKE '$this->u_email'";
 
             try {
                 $result = $this->conn->query($query);
