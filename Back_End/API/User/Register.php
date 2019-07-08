@@ -1,11 +1,10 @@
 <?php
 
 /*
-    user log in. Send token with success message.
+   Tutor log in. Send token with success message.
 
     API call is made using POST to this script.
 */
-    session_start();
 
     // Required headers
     // First line allows API calls from any address
@@ -14,56 +13,52 @@
     header("Access-Control-Allow-Methods: POST");
 
     // Include database and object files
-    include_once "../Config/Database.php";
+    include_once "../Config/database.php";
     include_once "../Objects/User.php";
     
     // Instantiate database
     $database = new Database();
     $db = $database->getConnection();
     
-    // Initialize user object
-    $user = new User($db);
+    // Initialize tutor object
+    $user = new user($db);
+    
 
     // Get data sent from front-end
     // php://input includes body data sent using POST
     // file_get_contents reads parameter into one string
     // json_decode converts json string to php variable
-    $data = json_decode(file_get_contents("php://input"));
-    
+    $data = json_decode(file_get_contents('php://input'));
+
     // Check that data is not missing any info
     if (!empty($data->email) &&
+        !empty($data->name) &&
+        !empty($data->phonenumber) &&
+        !empty($data->address) &&
         !empty($data->password)) {
-
-        // Set values in user.php
-        $user->u_email        = $data->email;
-        $user->u_password  = $data->password;
-
-        // Successful login returns true
-        if ($user->login($data->email,$data->password)) {
-            // Create success array
-            $successArray["Success"] = array();
-            
-            // Fetch newly created user's id and send created token as well (replace TBA)
-            $userID = $user->fetchID();
-
-            array_push($successArray["Success"], array("User ID" => $userID, "Token" => "TBA"));
-
-            // Session variable
-            $_SESSION["loggedIn"] = true;
-            $_SESSION["who"] = 'user';
+        
+        // Set values in tutor.php
+        $user->u_email       = $data->email;
+        $user->u_name        = $data->name;
+        $user->u_phonenumber = $data->phonenumber;
+        $user->u_address     = $data->address;
+        $user->u_password    = $data->password;
+       
+        // Successful registration returns true
+        if ($user->register()) {
 
             // HTTP status code - 200 OK
             http_response_code(200);
 
-            echo json_encode($successArray);
+            echo json_encode(array("Success" => "User Created"));
         }
         // Request failed
         else {
 
-            // HTTP status code - 401 Unauthorized
-            http_response_code(401);
+            // HTTP status code - 400 Bad Request
+            http_response_code(400);
 
-            echo json_encode(array("Message" => "Wrong Email Or Password"));
+            echo json_encode(array("Message" => "User Already Exists"));
         }
     }
     // Data missing
@@ -71,7 +66,6 @@
 
         // HTTP status code - 400 Bad Request
         http_response_code(400);
-
         echo json_encode(array("Message" => "Bad Request. Incomplete Data"));
     }
 ?>
