@@ -114,7 +114,6 @@
             }
             // User with given email not in database
             else {
-                echo "false 2";
                 return false;
             }
         }
@@ -125,7 +124,7 @@
             // FIXME For some reason u_email = $this->u_email results in SQL error
             // Using conn->query also makes this vulnerable to SQL injection
             // But prepare and execute refused to work for me
-            $query = "SELECT idUser FROM $this->tableName WHERE idUser LIKE '$this->u_id'";
+            $query = "SELECT idUser FROM $this->tableName WHERE Email LIKE '$this->u_email'";
 
             try {
                 $result = $this->conn->query($query);
